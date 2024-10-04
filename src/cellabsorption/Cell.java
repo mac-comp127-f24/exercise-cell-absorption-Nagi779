@@ -57,4 +57,40 @@ public class Cell {
         double pi2 = Math.PI * 2;
         return ((theta + Math.PI) % pi2 + pi2) % pi2 - Math.PI;
     }
+
+    public Point getCenter() {
+        return shape.getCenter();
+    }
+
+    public void interactWith(Cell otherCell) {
+        if (radius == 0 || otherCell.radius == 0) {
+            return; // No interaction if either cell has zero radius
+        }
+        if (overlapAmount(otherCell) < 0) {
+            return; // No interaction if cells do not overlap
+        }
+
+        if (radius > otherCell.radius) {
+            absorb(otherCell);
+        } else {
+            otherCell.absorb(this);
+        }
+    }
+
+    private double overlapAmount(Cell otherCell) {
+        return radius + otherCell.radius - getCenter().distance(otherCell.getCenter());
+    }
+
+    private void absorb(Cell otherCell) {
+        double d = getCenter().distance(otherCell.getCenter());
+        double a = sqr(radius) + sqr(otherCell.radius);
+        double newRadius = (d + Math.sqrt(2 * a - sqr(d))) / 2;
+
+        setRadius(newRadius);
+        otherCell.setRadius(d - newRadius);
+    }
+
+    private static double sqr(double x) {
+        return x * x;
+    }
 }
